@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌈 Cek Perasaan Harian</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #e8f5e9, #b3e5fc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .desc {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #34495e;
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dcdde1;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .icons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .icon-opt {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            text-align: center;
+            font-size: 30px;
+            transition: 0.2s;
+            width: 22%;
+            background: #f9f9f9;
+        }
+        .icon-opt:hover, .icon-opt.active {
+            border-color: #3498db;
+            background: #ebf5fb;
+            transform: scale(1.05);
+        }
+        .icon-label {
+            font-size: 11px;
+            color: #7f8c8d;
+            display: block;
+            margin-top: 5px;
+        }
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        #hasil {
+            margin-top: 15px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .sukses {
+            background: #d4edda;
+            color: #155724;
+        }
+        .gagal {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .toggle-bantuan {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toggle-bantuan input {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌈 Bagaimana Perasaanmu Hari Ini?</h1>
+        <p class="desc">Ini adalah ruang aman untuk berbagi. Data ini hanya dilihat oleh wali kelas dan guru BK.</p>
+        
+        <div class="input-group">
+            <label>Nama Lengkap</label>
+            <input type="text" id="nama" placeholder="Masukkan nama kamu">
+        </div>
+
+        <div class="input-group">
+            <label>Kelas</label>
+            <select id="kelas">
+                <option value="">-- Pilih Kelas --</option>
+                <option value="10-IPA-1">10-IPA-1</option>
+                <option value="10-IPA-2">10-IPA-2</option>
+                <option value="10-IPS-1">10-IPS-1</option>
+                <option value="11-IPA-1">11-IPA-1</option>
+                <option value="11-IPS-1">11-IPS-1</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label>Pilih Suasana Hati</label>
+            <div class="icons">
+                <div class="icon-opt" onclick="pilihIkon(this, 'Cerah', '☀️')">
+                    ☀️<span class="icon-label">Cerah</span>
+                </div>
+                <div class="icon-opt" onclick="pilihIkon(this, 'Berawan', '🌥️')">
+                    🌥️<span class="icon-label">Berawan</span>
+                </div>
+                <div class="icon-opt" onclick="pilihIkon(this, 'Mendung', '☁️')">
+                    ☁️<span class="icon-label">Mendung</span>
+                </div>
+                <div class="icon-opt" onclick="pilihIkon(this, 'Hujan', '🌧️')">
+                    🌧️<span class="icon-label">Hujan</span>
+                </div>
+            </div>
+            <input type="hidden" id="perasaan" value="">
+            <input type="hidden" id="ikon" value="">
+        </div>
+        
+        <div class="input-group">
+            <label>Ceritakan (Opsional)</label>
+            <textarea id="cerita" placeholder="Tulis apa yang kamu rasakan atau pikirkan..."></textarea>
+        </div>
+        
+        <div class="input-group">
+            <div class="toggle-bantuan">
+                <input type="checkbox" id="bantuan">
+                <label for="bantuan">⚠️ Saya ingin segera dibantu oleh Guru BK</label>
+            </div>
+        </div>
+        
+        <button onclick="kirimData()">Kirim Perasaanku ✨</button>
+        <div id="hasil"></div>
+    </div>
+
+    <script>
+        // GANTI dengan URL Google Form kamu
+        var FORM_URL = 'https://docs.google.com/forms/d/e/PASTE_FORM_ID_HERE/formResponse';
+        
+        // GANTI dengan ID field dari Google Form kamu (nanti saya ajarin cara dapatnya)
+        var FIELD_NAMA = 'entry.1234567890';
+        var FIELD_KELAS = 'entry.0987654321';
+        var FIELD_PERASAAN = 'entry.1111111111';
+        var FIELD_IKON = 'entry.2222222222';
+        var FIELD_CERITA = 'entry.3333333333';
+        var FIELD_BANTUAN = 'entry.4444444444';
+
+        var ikonTerpilih = '';
+        var perasaanTerpilih = '';
+
+        function pilihIkon(el, perasaan, ikon) {
+            document.querySelectorAll('.icon-opt').forEach(opt => opt.classList.remove('active'));
+            el.classList.add('active');
+            perasaanTerpilih = perasaan;
+            ikonTerpilih = ikon;
+            document.getElementById('perasaan').value = perasaan;
+            document.getElementById('ikon').value = ikon;
+        }
+        
+        function kirimData() {
+            var nama = document.getElementById('nama').value.trim();
+            var kelas = document.getElementById('kelas').value;
+            var cerita = document.getElementById('cerita').value.trim();
+            var bantuan = document.getElementById('bantuan').checked ? 'Ya' : 'Tidak';
+            var hasil = document.getElementById('hasil');
+            
+            if (!nama || !kelas || !perasaanTerpilih) {
+                hasil.className = 'gagal';
+                hasil.innerText = '❌ Mohon isi nama, kelas, dan pilih suasana hati ya!';
+                hasil.style.display = 'block';
+                return;
+            }
+
+            // Tampilkan loading
+            hasil.className = '';
+            hasil.style.background = '#fff3cd';
+            hasil.style.color = '#856404';
+            hasil.innerText = '⏳ Mengirim data...';
+            hasil.style.display = 'block';
+            
+            // Buat form data untuk dikirim ke Google Form
+            var formData = new FormData();
+            formData.append(FIELD_NAMA, nama);
+            formData.append(FIELD_KELAS, kelas);
+            formData.append(FIELD_PERASAAN, perasaanTerpilih);
+            formData.append(FIELD_IKON, ikonTerpilih);
+            formData.append(FIELD_CERITA, cerita);
+            formData.append(FIELD_BANTUAN, bantuan);
+            
+            // Kirim ke Google Form
+            fetch(FORM_URL, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors'
+            })
+            .then(() => {
+                hasil.className = 'sukses';
+                hasil.innerText = '✅ Data berhasil dikirim! Terima kasih sudah berbagi.';
+                // Reset form
+                document.getElementById('nama').value = '';
+                document.getElementById('kelas').value = '';
+                document.getElementById('cerita').value = '';
+                document.getElementById('bantuan').checked = false;
+                document.querySelectorAll('.icon-opt').forEach(opt => opt.classList.remove('active'));
+                perasaanTerpilih = '';
+                ikonTerpilih = '';
+            })
+            .catch(() => {
+                hasil.className = 'gagal';
+                hasil.innerText = '❌ Gagal mengirim data. Silakan coba lagi.';
+            });
+        }
+    </script>
+</body>
+</html>
